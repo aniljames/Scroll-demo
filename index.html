@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bajaj Auto — Born to Race</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,600;1,300&family=Barlow+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --orange: #E8520A;
+    --white: #F4F0E8;
+    --dark: #080806;
+    --mid: #1A1A16;
+    --gray: #6B6B62;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'Barlow', sans-serif;
+    --font-cond: 'Barlow Condensed', sans-serif;
+  }
+
+  html { scroll-behavior: auto; }
+
+  body {
+    background: var(--dark);
+    color: var(--white);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  #cursor {
+    position: fixed; width: 10px; height: 10px;
+    background: var(--orange); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+    mix-blend-mode: difference;
+  }
+  #cursor-ring {
+    position: fixed; width: 36px; height: 36px;
+    border: 1px solid rgba(232,82,10,0.5); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%,-50%);
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 48px;
+  }
+  nav::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(8,8,6,0.75) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  .nav-logo {
+    font-family: var(--font-display); font-size: 28px;
+    letter-spacing: 0.12em; color: var(--white); position: relative; z-index: 1;
+  }
+  .nav-logo span { color: var(--orange); }
+  .nav-links {
+    display: flex; gap: 36px; list-style: none; position: relative; z-index: 1;
+  }
+  .nav-links a {
+    font-family: var(--font-cond); font-size: 12px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: rgba(244,240,232,0.6);
+    text-decoration: none; transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--orange); }
+  .nav-cta {
+    position: relative; z-index: 1;
+    font-family: var(--font-cond); font-size: 11px; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--white);
+    border: 1px solid rgba(244,240,232,0.3);
+    padding: 10px 24px; cursor: none; background: transparent;
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .nav-cta:hover { border-color: var(--orange); color: var(--orange); }
+
+  #scroll-container { position: relative; height: 600vh; }
+
+  #hero-sticky {
+    position: sticky; top: 0; height: 100vh; overflow: hidden;
+  }
+
+  #hero-video {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; will-change: transform;
+  }
+
+  .grain {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px; animation: grain-anim 0.4s steps(2) infinite;
+  }
+  @keyframes grain-anim {
+    0%{transform:translate(0,0)}25%{transform:translate(-3px,2px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,3px)}100%{transform:translate(3px,-2px)}
+  }
+  .vignette {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 25%, rgba(8,8,6,0.88) 100%);
+  }
+  .bottom-fade {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 45%;
+    z-index: 4; pointer-events: none;
+    background: linear-gradient(to top, var(--dark) 0%, transparent 100%);
+  }
+
+  #hero-content {
+    position: absolute; inset: 0; z-index: 10;
+    display: flex; flex-direction: column;
+    justify-content: flex-end; padding: 0 0 72px 64px;
+  }
+  .hero-eyebrow {
+    font-family: var(--font-cond); font-size: 11px; letter-spacing: 0.35em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 16px;
+    opacity: 0; transform: translateY(20px); transition: opacity 1s, transform 1s;
+  }
+  .hero-eyebrow.v { opacity: 1; transform: translateY(0); }
+  .hero-title {
+    font-family: var(--font-display); font-size: clamp(80px,11vw,160px);
+    line-height: 0.9; letter-spacing: 0.02em; color: var(--white); margin-bottom: 28px;
+    opacity: 0; transform: translateY(30px); transition: opacity 1.2s 0.1s, transform 1.2s 0.1s;
+  }
+  .hero-title.v { opacity: 1; transform: translateY(0); }
+  .hero-title em { color: var(--orange); font-style: normal; }
+  .hero-sub {
+    max-width: 380px; font-size: 15px; line-height: 1.7; font-weight: 300;
+    color: rgba(244,240,232,0.65); margin-bottom: 40px;
+    opacity: 0; transform: translateY(20px); transition: opacity 1s 0.25s, transform 1s 0.25s;
+  }
+  .hero-sub.v { opacity: 1; transform: translateY(0); }
+  .hero-actions {
+    display: flex; align-items: center; gap: 28px;
+    opacity: 0; transform: translateY(20px); transition: opacity 1s 0.4s, transform 1s 0.4s;
+  }
+  .hero-actions.v { opacity: 1; transform: translateY(0); }
+
+  .btn-primary {
+    font-family: var(--font-cond); font-size: 11px; letter-spacing: 0.25em;
+    text-transform: uppercase; background: var(--orange); color: var(--dark);
+    border: none; padding: 16px 36px; cursor: none; font-weight: 700;
+    transition: background 0.3s, transform 0.2s;
+  }
+  .btn-primary:hover { background: #ff6a1a; transform: translateY(-2px); }
+  .btn-ghost {
+    font-family: var(--font-cond); font-size: 11px; letter-spacing: 0.25em;
+    text-transform: uppercase; color: rgba(244,240,232,0.7);
+    display: flex; align-items: center; gap: 10px; cursor: none;
+    transition: color 0.3s; text-decoration: none;
+  }
+  .btn-ghost:hover { color: var(--white); }
+  .btn-ghost svg { transition: transform 0.3s; }
+  .btn-ghost:hover svg { transform: translateX(4px); }
+
+  #hero-stats {
+    position: absolute; right: 64px; bottom: 72px; z-index: 10;
+    display: flex; flex-direction: column; gap: 32px;
+    opacity: 0; transform: translateX(20px); transition: opacity 1.2s 0.5s, transform 1.2s 0.5s;
+  }
+  #hero-stats.v { opacity: 1; transform: translateX(0); }
+  .stat-item { text-align: right; }
+  .stat-num { font-family: var(--font-display); font-size: 42px; line-height: 1; color: var(--white); }
+  .stat-num span { color: var(--orange); font-size: 24px; }
+  .stat-label {
+    font-family: var(--font-cond); font-size: 10px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--gray); margin-top: 4px;
+  }
+  .stat-divider { width: 1px; height: 40px; background: rgba(232,82,10,0.3); align-self: flex-end; }
+
+  #scroll-hint {
+    position: absolute; left: 64px; bottom: 72px; z-index: 10;
+    display: flex; align-items: center; gap: 14px;
+    opacity: 0; transition: opacity 1s 0.8s;
+  }
+  #scroll-hint.v { opacity: 1; }
+  .scroll-line {
+    width: 48px; height: 1px; background: rgba(244,240,232,0.2);
+    position: relative; overflow: hidden;
+  }
+  .scroll-line::after {
+    content: ''; position: absolute; left: -100%; top: 0; width: 100%; height: 100%;
+    background: var(--orange); animation: sp 1.8s ease-in-out infinite;
+  }
+  @keyframes sp { 0%{left:-100%} 100%{left:100%} }
+  .scroll-text {
+    font-family: var(--font-cond); font-size: 10px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: rgba(244,240,232,0.35);
+  }
+
+  #progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--orange); z-index: 200; width: 0%;
+    transition: width 0.04s linear;
+  }
+
+  #text-panels {
+    position: absolute; top: 0; right: 64px; z-index: 10;
+    width: 340px; height: 100vh; display: flex; align-items: center;
+    pointer-events: none;
+  }
+  .panel-item {
+    position: absolute; right: 0; width: 100%;
+    opacity: 0; transform: translateY(32px);
+    transition: opacity 0.5s, transform 0.5s; pointer-events: none;
+  }
+  .panel-item.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .panel-tag {
+    font-family: var(--font-cond); font-size: 10px; letter-spacing: 0.35em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .panel-tag::before { content: ''; display: block; width: 24px; height: 1px; background: var(--orange); }
+  .panel-heading {
+    font-family: var(--font-display); font-size: 52px; line-height: 0.95;
+    color: var(--white); margin-bottom: 16px;
+  }
+  .panel-body {
+    font-size: 14px; line-height: 1.75; font-weight: 300;
+    color: rgba(244,240,232,0.6);
+    border-left: 1px solid rgba(232,82,10,0.4); padding-left: 16px;
+  }
+
+  #post-scroll { background: var(--dark); position: relative; z-index: 20; }
+
+  .section-divider {
+    width: 100%; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(232,82,10,0.35), transparent);
+  }
+
+  .marquee-section {
+    padding: 28px 0; overflow: hidden;
+    border-top: 1px solid rgba(232,82,10,0.12);
+    border-bottom: 1px solid rgba(232,82,10,0.12);
+  }
+  .marquee-track {
+    display: flex; white-space: nowrap; animation: marquee 22s linear infinite;
+  }
+  .marquee-item {
+    font-family: var(--font-display); font-size: 76px;
+    color: transparent; -webkit-text-stroke: 1px rgba(244,240,232,0.07);
+    padding: 0 44px; flex-shrink: 0;
+  }
+  .marquee-item.accent { -webkit-text-stroke: 1px rgba(232,82,10,0.28); }
+  @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  #models-section { padding: 120px 64px; }
+  .section-header {
+    display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 72px;
+  }
+  .section-eyebrow {
+    font-family: var(--font-cond); font-size: 11px; letter-spacing: 0.35em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: var(--font-display); font-size: 72px; line-height: 0.92; color: var(--white);
+  }
+  .section-subtitle {
+    font-size: 14px; font-weight: 300; color: var(--gray);
+    max-width: 260px; line-height: 1.7; text-align: right;
+  }
+
+  .models-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; }
+
+  .model-card {
+    position: relative; overflow: hidden; aspect-ratio: 3/4;
+    cursor: none; background: var(--mid);
+  }
+  .model-card-img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.5s;
+    filter: brightness(0.5) saturate(0.85);
+  }
+  .model-card:hover .model-card-img { transform: scale(1.06); filter: brightness(0.7) saturate(1.1); }
+  .model-card-overlay {
+    position: absolute; inset: 0; z-index: 2;
+    background: linear-gradient(to top, rgba(8,8,6,0.97) 0%, rgba(8,8,6,0.2) 55%, transparent 100%);
+  }
+  .model-card-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 32px; z-index: 3; }
+  .model-badge {
+    display: inline-block; font-family: var(--font-cond); font-size: 9px;
+    letter-spacing: 0.3em; text-transform: uppercase; color: var(--orange);
+    border: 1px solid rgba(232,82,10,0.5); padding: 4px 10px; margin-bottom: 12px;
+  }
+  .model-name {
+    font-family: var(--font-display); font-size: 42px; line-height: 0.95;
+    color: var(--white); margin-bottom: 8px;
+  }
+  .model-spec {
+    font-family: var(--font-cond); font-size: 12px; letter-spacing: 0.15em; color: var(--gray); margin-bottom: 20px;
+  }
+  .model-link {
+    font-family: var(--font-cond); font-size: 10px; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--orange);
+    display: flex; align-items: center; gap: 8px;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.4s, transform 0.4s; cursor: none;
+  }
+  .model-card:hover .model-link { opacity: 1; transform: translateY(0); }
+
+  /* FEATURE VIDEO */
+  #feature-video-section { position: relative; overflow: hidden; height: 70vh; }
+  #feature-video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.45) saturate(0.8); }
+  .feature-video-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(120deg, rgba(8,8,6,0.88) 0%, transparent 65%);
+    display: flex; align-items: center; padding: 0 80px; z-index: 2;
+  }
+  .feature-video-content { max-width: 520px; }
+  .feature-tag {
+    font-family: var(--font-cond); font-size: 10px; letter-spacing: 0.35em;
+    text-transform: uppercase; color: var(--orange);
+    display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+  }
+  .feature-tag::before { content: ''; width: 32px; height: 1px; background: var(--orange); display: block; }
+  .feature-title {
+    font-family: var(--font-display); font-size: 80px; line-height: 0.9;
+    color: var(--white); margin-bottom: 24px;
+  }
+  .feature-body {
+    font-size: 15px; line-height: 1.8; font-weight: 300;
+    color: rgba(244,240,232,0.65); margin-bottom: 36px;
+  }
+  .feature-specs { display: flex; gap: 40px; }
+  .feature-spec-num { font-family: var(--font-display); font-size: 40px; color: var(--orange); line-height: 1; }
+  .feature-spec-label {
+    font-family: var(--font-cond); font-size: 10px; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--gray); margin-top: 4px;
+  }
+
+  /* GALLERY STRIP */
+  #gallery-strip {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    height: 80vh; gap: 2px;
+  }
+  .gallery-cell { position: relative; overflow: hidden; }
+  .gallery-cell img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.5s;
+    filter: brightness(0.6) saturate(0.85);
+  }
+  .gallery-cell:hover img { transform: scale(1.05); filter: brightness(0.8) saturate(1.05); }
+  .gallery-cell.tall { grid-row: 1 / 3; }
+  .gallery-label {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 2;
+    padding: 20px 24px;
+    background: linear-gradient(to top, rgba(8,8,6,0.92) 0%, transparent 100%);
+  }
+  .gallery-label-text { font-family: var(--font-display); font-size: 26px; color: var(--white); line-height: 1; }
+  .gallery-label-sub {
+    font-family: var(--font-cond); font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--orange); margin-top: 4px;
+  }
+
+  /* HERITAGE */
+  #heritage-section {
+    padding: 120px 64px; display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+  }
+  .heritage-number {
+    font-family: var(--font-display); font-size: 180px; line-height: 0.85;
+    color: transparent; -webkit-text-stroke: 1px rgba(232,82,10,0.18); margin-bottom: -20px;
+  }
+  .heritage-title {
+    font-family: var(--font-display); font-size: 64px; line-height: 0.95;
+    color: var(--white); margin-bottom: 28px;
+  }
+  .heritage-body {
+    font-size: 15px; line-height: 1.8; font-weight: 300;
+    color: rgba(244,240,232,0.6); margin-bottom: 40px;
+  }
+  .heritage-stats { display: flex; gap: 48px; }
+  .heritage-stat-num { font-family: var(--font-display); font-size: 48px; color: var(--orange); line-height: 1; }
+  .heritage-stat-label {
+    font-family: var(--font-cond); font-size: 10px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--gray); margin-top: 6px;
+  }
+  .hr-orange { width: 40px; height: 2px; background: var(--orange); margin-bottom: 20px; }
+
+  /* PROMO VIDEO */
+  #promo-video-section { position: relative; overflow: hidden; height: 60vh; }
+  #promo-video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4) saturate(0.7); }
+  .promo-overlay {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    background: rgba(8,8,6,0.28);
+  }
+  .promo-text { max-width: 700px; }
+  .promo-eyebrow {
+    font-family: var(--font-cond); font-size: 11px; letter-spacing: 0.4em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 20px;
+  }
+  .promo-title {
+    font-family: var(--font-display); font-size: 96px; line-height: 0.88;
+    color: var(--white); margin-bottom: 32px;
+  }
+  .promo-cta {
+    font-family: var(--font-cond); font-size: 11px; letter-spacing: 0.25em;
+    text-transform: uppercase; background: var(--orange); color: var(--dark);
+    border: none; padding: 16px 40px; cursor: none; font-weight: 700; transition: background 0.3s;
+  }
+  .promo-cta:hover { background: #ff6a1a; }
+
+  footer {
+    padding: 48px 64px; border-top: 1px solid rgba(244,240,232,0.06);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo { font-family: var(--font-display); font-size: 20px; letter-spacing: 0.12em; color: rgba(244,240,232,0.3); }
+  .footer-logo span { color: rgba(232,82,10,0.5); }
+  .footer-copy { font-family: var(--font-cond); font-size: 10px; letter-spacing: 0.2em; color: rgba(244,240,232,0.2); text-transform: uppercase; }
+
+  .fade-up {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+  }
+  .fade-up.in-view { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    #hero-content { padding: 0 0 60px 24px; }
+    #hero-stats { right: 24px; bottom: 60px; }
+    #scroll-hint { left: 24px; }
+    #text-panels { right: 24px; width: 260px; }
+    #models-section { padding: 80px 24px; }
+    .models-grid { grid-template-columns: 1fr; }
+    #gallery-strip { grid-template-columns: 1fr 1fr; height: auto; }
+    .gallery-cell.tall { grid-row: auto; }
+    .gallery-cell { height: 240px; }
+    #heritage-section { grid-template-columns: 1fr; padding: 80px 24px; gap: 40px; }
+    .heritage-number { font-size: 100px; }
+    .feature-video-overlay { padding: 0 32px; }
+    .feature-title { font-size: 56px; }
+    .promo-title { font-size: 60px; }
+    footer { padding: 32px 24px; flex-direction: column; gap: 16px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div id="progress-bar"></div>
+
+<nav>
+  <div class="nav-logo">BAJAJ<span>.</span>AUTO</div>
+  <ul class="nav-links">
+    <li><a href="#">Models</a></li>
+    <li><a href="#">Performance</a></li>
+    <li><a href="#">Racing</a></li>
+    <li><a href="#">Heritage</a></li>
+    <li><a href="#">Dealers</a></li>
+  </ul>
+  <button class="nav-cta">Configure Now</button>
+</nav>
+
+<!-- SCROLL-SCRUBBED HERO -->
+<div id="scroll-container">
+  <div id="hero-sticky">
+
+    <video id="hero-video" muted playsinline preload="auto">
+      <!-- Primary: Mixkit highway motorcycle ride -->
+      <source src="C:\Users\Anil James\Downloads\Bike hero.mp4" type="video/mp4">
+      <!-- Fallback: Mixkit man on highway -->
+      <source src="C:\Users\Anil James\Downloads\Bike hero.mp4" type="video/mp4">
+    </video>
+
+    <div class="grain"></div>
+    <div class="vignette"></div>
+    <div class="bottom-fade"></div>
+
+    <div id="hero-content">
+      <div class="hero-eyebrow">Bajaj Auto — Since 1945</div>
+      <div class="hero-title">BORN<br>TO <em>RACE</em></div>
+      <div class="hero-sub">Engineered at the intersection of raw power and precision. Every machine a declaration of intent on the open road.</div>
+      <div class="hero-actions">
+        <button class="btn-primary">Explore Lineup</button>
+        <a class="btn-ghost" href="#">
+          Watch Reel
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1"/>
+            <path d="M6.5 5.5L10.5 8L6.5 10.5V5.5Z" fill="currentColor"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    
+
+    <div id="scroll-hint">
+      <div class="scroll-line"></div>
+      <div class="scroll-text">Scroll to explore</div>
+    </div>
+
+    <div id="text-panels">
+      <div class="panel-item" id="panel-1">
+        <div class="panel-tag">Engine</div>
+        <div class="panel-heading">LIQUID COOLED FURY</div>
+        <div class="panel-body">Triple-spark technology meets liquid cooling. An engine that breathes fire and runs cold. Redline hits different when the machine is this alive.</div>
+      </div>
+      <div class="panel-item" id="panel-2">
+        <div class="panel-tag">Dynamics</div>
+        <div class="panel-heading">CORNERS ARE CONVERSATIONS</div>
+        <div class="panel-body">Perimeter frame with USD forks and mono-shock rear. The road talks — the Pulsar listens and responds in milliseconds.</div>
+      </div>
+      <div class="panel-item" id="panel-3">
+        <div class="panel-tag">Design</div>
+        <div class="panel-heading">SCULPTED BY VELOCITY</div>
+        <div class="panel-body">Wind-tunnel influenced fairings. Twin-LED pilots pierce darkness. Form follows function — and function is devastatingly fast.</div>
+      </div>
+      <div class="panel-item" id="panel-4">
+        <div class="panel-tag">Control</div>
+        <div class="panel-heading">POWER AT COMMAND</div>
+        <div class="panel-body">Dual-channel ABS, ride-by-wire throttle, slipper clutch — an invisible safety net that keeps you in control at the very edge.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="post-scroll">
+
+  <!-- MARQUEE -->
+  <div class="marquee-section">
+    <div class="marquee-track">
+      <span class="marquee-item">PULSAR</span><span class="marquee-item accent">•</span>
+      <span class="marquee-item">DOMINAR</span><span class="marquee-item accent">•</span>
+      <span class="marquee-item">AVENGER</span><span class="marquee-item accent">•</span>
+      <span class="marquee-item">NS400Z</span><span class="marquee-item accent">•</span>
+      <span class="marquee-item">RS200</span><span class="marquee-item accent">•</span>
+      <span class="marquee-item">PULSAR</span><span class="marquee-item accent">•</span>
+      <span class="marquee-item">DOMINAR</span><span class="marquee-item accent">•</span>
+      <span class="marquee-item">AVENGER</span><span class="marquee-item accent">•</span>
+    </div>
+  </div>
+
+  <!-- MODELS — real bike photos from aeplcdn.com -->
+  <section id="models-section">
+    <div class="section-header fade-up">
+      <div>
+        <div class="section-eyebrow">2025 Lineup</div>
+        <div class="section-title">THE<br>MACHINES</div>
+      </div>
+      <div class="section-subtitle">Each model engineered for a distinct rider. Same Bajaj soul. Infinite character.</div>
+    </div>
+    <div class="models-grid">
+
+      <div class="model-card fade-up" style="transition-delay:0.1s">
+        <img class="model-card-img"
+          src="https://imgd.aeplcdn.com/1056x594/n/cw/ec/58025/pulsar-ns-right-side-view-12.png?isig=0&q=80"
+          alt="Bajaj Pulsar NS200">
+        <div class="model-card-overlay"></div>
+        <div class="model-card-content">
+          <div class="model-badge">Street Sport</div>
+          <div class="model-name">PULSAR<br>NS200</div>
+          <div class="model-spec">199.5cc — 24.5 BHP — 6-speed</div>
+          <div class="model-link">Explore &#8594;</div>
+        </div>
+      </div>
+
+      <div class="model-card fade-up" style="transition-delay:0.2s">
+        <img class="model-card-img"
+          src="https://imgd.aeplcdn.com/1056x594/n/cw/ec/114423/dominar-400-right-side-view-3.png?isig=0&q=80"
+          alt="Bajaj Dominar 400">
+        <div class="model-card-overlay"></div>
+        <div class="model-card-content">
+          <div class="model-badge">Adventure Tourer</div>
+          <div class="model-name">DOMINAR<br>400</div>
+          <div class="model-spec">373.3cc — 40 BHP — 6-speed</div>
+          <div class="model-link">Explore &#8594;</div>
+        </div>
+      </div>
+
+      <div class="model-card fade-up" style="transition-delay:0.3s">
+        <img class="model-card-img"
+          src="https://imgd.aeplcdn.com/1056x594/n/cw/ec/195431/rs-200-right-side-view-2.png?isig=0&q=80"
+          alt="Bajaj Pulsar RS200">
+        <div class="model-card-overlay"></div>
+        <div class="model-card-content">
+          <div class="model-badge">Full Fairing Race</div>
+          <div class="model-name">PULSAR<br>RS200</div>
+          <div class="model-spec">199.5cc — 24.5 BHP — Race-tuned</div>
+          <div class="model-link">Explore &#8594;</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- FEATURE VIDEO 1 -->
+  <section id="feature-video-section">
+    <video id="feature-video" autoplay muted loop playsinline>
+      <source src="C:\Users\Anil James\Downloads\Bike hero.mp4" type="video/mp4">
+      <source src="C:\Users\Anil James\Downloads\Bike hero.mp4" type="video/mp4">
+    </video>
+    <div class="feature-video-overlay">
+      <div class="feature-video-content fade-up">
+        <div class="feature-tag">Dominar 400</div>
+        <div class="feature-title">CONQUER<br>EVERY<br>HORIZON</div>
+        <div class="feature-body">The Dominar 400 is built to devour distances. A 373.3cc DOHC engine, slipper clutch, and switchable traction control make every road your domain.</div>
+        <div class="feature-specs">
+          <div>
+            <div class="feature-spec-num">40</div>
+            <div class="feature-spec-label">Horsepower</div>
+          </div>
+          <div>
+            <div class="feature-spec-num">35</div>
+            <div class="feature-spec-label">Nm Torque</div>
+          </div>
+          <div>
+            <div class="feature-spec-num">4</div>
+            <div class="feature-spec-label">Ride Modes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY STRIP — real bike images with varied treatments -->
+  <div id="gallery-strip">
+    <div class="gallery-cell tall fade-up">
+      <img src="https://imgd.aeplcdn.com/1056x594/n/cw/ec/58025/pulsar-ns-right-side-view-12.png?isig=0&q=80"
+        alt="Pulsar NS200" style="object-position: center center;">
+      <div class="gallery-label">
+        <div class="gallery-label-text">PULSAR NS200</div>
+        <div class="gallery-label-sub">199.5cc Streetfighter</div>
+      </div>
+    </div>
+    <div class="gallery-cell fade-up" style="transition-delay:0.1s">
+      <img src="https://imgd.aeplcdn.com/1056x594/n/cw/ec/114423/dominar-400-right-side-view-3.png?isig=0&q=80"
+        alt="Dominar 400">
+      <div class="gallery-label">
+        <div class="gallery-label-text">DOMINAR 400</div>
+        <div class="gallery-label-sub">373cc Tourer</div>
+      </div>
+    </div>
+    <div class="gallery-cell fade-up" style="transition-delay:0.15s">
+      <img src="https://imgd.aeplcdn.com/1056x594/n/cw/ec/195431/rs-200-right-side-view-2.png?isig=0&q=80"
+        alt="Pulsar RS200">
+      <div class="gallery-label">
+        <div class="gallery-label-text">PULSAR RS200</div>
+        <div class="gallery-label-sub">Full Faired Racer</div>
+      </div>
+    </div>
+    <div class="gallery-cell fade-up" style="transition-delay:0.2s">
+      <img src="https://imgd.aeplcdn.com/1056x594/n/cw/ec/58025/pulsar-ns-right-side-view-12.png?isig=0&q=80"
+        alt="NS200 Detail"
+        style="object-position: 70% center; filter: brightness(0.4) saturate(0.5) hue-rotate(20deg);">
+      <div class="gallery-label">
+        <div class="gallery-label-text">RIDE MODES</div>
+        <div class="gallery-label-sub">Sport · Road · Rain</div>
+      </div>
+    </div>
+    <div class="gallery-cell fade-up" style="transition-delay:0.25s">
+      <img src="https://imgd.aeplcdn.com/1056x594/n/cw/ec/114423/dominar-400-right-side-view-3.png?isig=0&q=80"
+        alt="Dominar Detail"
+        style="object-position: 20% center; filter: brightness(0.35) saturate(0.45) hue-rotate(-15deg);">
+      <div class="gallery-label">
+        <div class="gallery-label-text">ABS + TCS</div>
+        <div class="gallery-label-sub">Dual-Channel Safety</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- HERITAGE -->
+  <section id="heritage-section">
+    <div class="fade-up">
+      <div class="heritage-number">75</div>
+    </div>
+    <div class="fade-up" style="transition-delay:0.2s">
+      <div class="hr-orange"></div>
+      <div class="section-eyebrow">Our Legacy</div>
+      <div class="heritage-title">SEVEN DECADES<br>OF THUNDER</div>
+      <div class="heritage-body">From the first Bajaj Chetak that democratised mobility for millions, to the fire-breathing Dominar that conquers continents — our legacy is built on one obsession: building machines that move people, literally and emotionally. Born in Pune. Built for the world.</div>
+      <div class="heritage-stats">
+        <div>
+          <div class="heritage-stat-num">50M+</div>
+          <div class="heritage-stat-label">Bikes on Road</div>
+        </div>
+        <div>
+          <div class="heritage-stat-num">70+</div>
+          <div class="heritage-stat-label">Countries</div>
+        </div>
+        <div>
+          <div class="heritage-stat-num">#2</div>
+          <div class="heritage-stat-label">Global Exporter</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMO VIDEO 2 -->
+  <section id="promo-video-section">
+    <video id="promo-video" autoplay muted loop playsinline>
+      <source src="C:\Users\Anil James\Downloads\Bike hero.mp4" type="video/mp4">
+      <source src="C:\Users\Anil James\Downloads\Bike hero.mp4" type="video/mp4">
+    </video>
+    <div class="promo-overlay">
+      <div class="promo-text fade-up">
+        <div class="promo-eyebrow">The Pulsar Legacy</div>
+        <div class="promo-title">DEFINITELY<br>MALE</div>
+        <button class="promo-cta">Find Your Ride</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE 2 -->
+  <div class="marquee-section">
+    <div class="marquee-track" style="animation-direction:reverse; animation-duration:26s;">
+      <span class="marquee-item">RACING DNA</span><span class="marquee-item accent">✕</span>
+      <span class="marquee-item">HERITAGE</span><span class="marquee-item accent">✕</span>
+      <span class="marquee-item">INNOVATION</span><span class="marquee-item accent">✕</span>
+      <span class="marquee-item">POWER</span><span class="marquee-item accent">✕</span>
+      <span class="marquee-item">RACING DNA</span><span class="marquee-item accent">✕</span>
+      <span class="marquee-item">HERITAGE</span><span class="marquee-item accent">✕</span>
+      <span class="marquee-item">INNOVATION</span><span class="marquee-item accent">✕</span>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">BAJAJ<span>.</span>AUTO</div>
+    <div class="footer-copy">© 2025 Bajaj Auto Ltd. Pune, India.</div>
+    <div class="footer-copy">Crafted with racing DNA</div>
+  </footer>
+
+</div>
+
+<script>
+// CURSOR
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => {
+  mx=e.clientX; my=e.clientY;
+  cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+});
+(function animRing(){
+  rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+})();
+
+// SCROLL-SCRUBBED VIDEO
+const video = document.getElementById('hero-video');
+const scrollContainer = document.getElementById('scroll-container');
+const progressBar = document.getElementById('progress-bar');
+let videoReady=false, lastScrollY=-1, rafId=null;
+
+video.addEventListener('loadedmetadata', () => { videoReady=true; });
+video.addEventListener('canplay', () => { videoReady=true; });
+video.pause();
+
+const panels = ['panel-1','panel-2','panel-3','panel-4'].map(id => document.getElementById(id));
+let activePanelIdx=-1;
+
+function setPanel(idx){
+  if(idx===activePanelIdx) return;
+  activePanelIdx=idx;
+  panels.forEach((p,i) => p.classList.toggle('active', i===idx));
+}
+
+function updateScroll(){
+  rafId=null;
+  const scrollY=window.scrollY;
+  if(scrollY===lastScrollY) return;
+  lastScrollY=scrollY;
+  const maxScroll=scrollContainer.offsetHeight - window.innerHeight;
+  const progress=Math.min(Math.max(scrollY/maxScroll,0),1);
+
+  progressBar.style.width=(progress*100)+'%';
+
+  if(videoReady && video.duration>0){
+    const t=progress*video.duration;
+    if(Math.abs(video.currentTime-t)>0.04) video.currentTime=t;
+  }
+
+  if(progress<0.16) setPanel(-1);
+  else if(progress<0.33) setPanel(0);
+  else if(progress<0.50) setPanel(1);
+  else if(progress<0.67) setPanel(2);
+  else if(progress<0.84) setPanel(3);
+  else setPanel(-1);
+}
+
+window.addEventListener('scroll',()=>{ if(!rafId) rafId=requestAnimationFrame(updateScroll); },{passive:true});
+
+// INTRO
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.querySelector('.hero-eyebrow').classList.add('v');
+    document.querySelector('.hero-title').classList.add('v');
+    document.querySelector('.hero-sub').classList.add('v');
+    document.querySelector('.hero-actions').classList.add('v');
+    document.getElementById('hero-stats').classList.add('v');
+    document.getElementById('scroll-hint').classList.add('v');
+  },300);
+});
+
+// FADE UP OBSERVER
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in-view'); });
+},{threshold:0.12});
+document.querySelectorAll('.fade-up').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
